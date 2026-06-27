@@ -94,7 +94,9 @@ gym-diary-frontend/
 
 Локальная проверка Pages-сборки: `npm run preview:pages`.
 
-Первичная настройка репозитория на GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+Первичная настройка репозитория на GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions** (не «Deploy from a branch»).
+
+Если Source = branch/main, на сайте будет dev-версия `index.html` и ошибка `GET .../src/main.tsx 404` — GitHub отдаёт исходники, а не `dist/`. Исправление: переключить Source на GitHub Actions, re-run workflow **Deploy to GitHub Pages**.
 
 При переименовании репозитория обнови `BASE_PATH` в workflow и скрипте `build:pages`. Для custom domain задай `BASE_PATH=/`.
 

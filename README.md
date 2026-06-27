@@ -29,8 +29,10 @@ npm run lint       # oxlint
 
 1. Запушь репозиторий на GitHub.
 2. Открой **Settings → Pages → Build and deployment**.
-3. В поле **Source** выбери **GitHub Actions**.
+3. В поле **Source** выбери **GitHub Actions** (не «Deploy from a branch»).
 4. После первого успешного workflow сайт будет доступен по ссылке выше.
+
+> **Важно:** если Source = «Deploy from a branch / main», GitHub отдаёт исходники репозитория (`index.html` с `/src/main.tsx`), а не сборку из `dist/`. В консоли будет `404` на `main.tsx`. Переключи Source на **GitHub Actions** и перезапусти workflow **Deploy to GitHub Pages** (Actions → Re-run all jobs).
 
 ### Локальная проверка Pages-сборки
 
