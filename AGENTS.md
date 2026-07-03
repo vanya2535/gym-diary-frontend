@@ -167,7 +167,7 @@ gym-diary-frontend/
 | Компонент                      | Назначение                                                              |
 | ------------------------------ | ----------------------------------------------------------------------- |
 | `vite.config.ts` → `base`      | Берётся из env `BASE_PATH` (по умолчанию `/`)                           |
-| `.github/workflows/deploy.yml` | Сборка с `BASE_PATH=/gym-diary-frontend/` и деплой через GitHub Actions |
+| `.github/workflows/deploy.yml` | Сборка с `BASE_PATH=/gym-diary-frontend/`, `VITE_API_URL` (Render backend), деплой через GitHub Actions |
 | `import.meta.env.BASE_URL`     | Использовать для путей к файлам из `public/` (иконки, favicon и т.д.)   |
 | `scripts/copy-spa-fallback.mjs`| После `build:pages` копирует `index.html` → `404.html` (SPA deep links) |
 | `public/manifest.webmanifest`  | `start_url: "."` — «Добавить на экран» открывает корень репозитория, не `/auth` |
@@ -188,11 +188,15 @@ Backend: **gym-diary-backend** (Fastify, opaque Bearer token).
 
 ### Переменные окружения
 
-| Переменная     | Назначение                           | Пример                  |
-| -------------- | ------------------------------------ | ----------------------- |
-| `VITE_API_URL` | Базовый URL API (без trailing slash) | `http://localhost:3000` |
+| Переменная     | Назначение                           | Пример                                                |
+| -------------- | ------------------------------------ | ----------------------------------------------------- |
+| `VITE_API_URL` | Базовый URL API (без trailing slash) | `http://localhost:3000` (dev), `https://gym-diary-backend.onrender.com` (prod) |
 
 Шаблон: `.env.example`. Локально скопируй в `.env`.
+
+**Production (GitHub Pages):** `VITE_API_URL` задаётся в `.github/workflows/deploy.yml` на шаге Build (Vite вшивает значение при сборке). После смены URL бэкенда — обнови workflow и re-run deploy.
+
+**Backend CORS:** origin фронта `https://vanya2535.github.io` должен быть в `CORS_ORIGINS` на Render (см. backend `render.yaml`).
 
 ### Авторизация
 
@@ -216,7 +220,7 @@ HTTP-клиент: `src/services/api.ts` (axios instance `apiClient`, обёрт
 
 В корне лежит `.npmrc` с `registry=https://registry.npmjs.org/` — он перекрывает корпоративный registry из глобального конфига. Не удаляй и не меняй без необходимости; после `npm install` в `package-lock.json` все `resolved` должны указывать на `registry.npmjs.org`.
 
-Для GitHub Pages задай `VITE_API_URL` при сборке (URL Render-бэкенда) и добавь этот origin в `CORS_ORIGINS` на backend.
+Для GitHub Pages задай `VITE_API_URL` при сборке (см. `deploy.yml`). На Render у бэкенда добавь origin фронта в `CORS_ORIGINS`.
 
 ## Документация: что обновлять
 
