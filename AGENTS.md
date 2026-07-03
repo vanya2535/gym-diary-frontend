@@ -4,16 +4,21 @@
 
 ## Назначение проекта
 
-Frontend-приложение «Gym Diary» — клиентская часть дневника тренировок. Сейчас проект на стадии инициализации: базовый шаблон Vite + React + TypeScript без бизнес-логики.
+Frontend-приложение «Gym Diary» — клиентская часть дневника тренировок. Архитектура — упрощённый FSD (Feature-Sliced Design).
 
 ## Стек
 
-| Слой | Технология | Версия (на момент инициализации) |
-|------|------------|----------------------------------|
-| Сборка | Vite | ^8.1.0 |
-| UI | React | ^19.2.7 |
-| Язык | TypeScript | ~6.0.2 |
-| Линтер | Oxlint | ^1.69.0 |
+| Слой             | Технология                 | Версия (на момент инициализации) |
+| ---------------- | -------------------------- | -------------------------------- |
+| Сборка           | Vite                       | ^8.1.0                           |
+| UI               | React                      | ^19.2.7                          |
+| HTTP-клиент      | axios                      | ^1.x                             |
+| Стили            | Sass (SCSS modules)        | ^1.x                             |
+| Маршрутизация    | react-router-dom           | ^7.x                             |
+| Состояние (auth) | zustand                    | ^5.x                             |
+| Язык             | TypeScript                 | ~6.0.2                           |
+| Линтер           | ESLint + typescript-eslint | ^10.x                            |
+| Форматирование   | Prettier                   | ^3.x                             |
 
 ## Команды
 
@@ -23,7 +28,10 @@ npm run build         # проверка типов (tsc -b) + production-сбо
 npm run build:pages   # сборка с base=/gym-diary-frontend/ (как на GitHub Pages)
 npm run preview       # локальный просмотр production-сборки
 npm run preview:pages # сборка для Pages + preview с корректным base path
-npm run lint          # oxlint
+npm run lint          # eslint + prettier --check
+npm run lint:fix      # eslint --fix + prettier --write
+npm run format        # prettier --write
+npm run format:check  # prettier --check
 ```
 
 Перед завершением задачи с изменениями кода убедись, что `npm run build` и `npm run lint` проходят без ошибок.
@@ -34,63 +42,121 @@ npm run lint          # oxlint
 gym-diary-frontend/
 ├── public/              # статика, отдаётся как есть (favicon, icons.svg)
 ├── src/
-│   ├── assets/          # импортируемые ресурсы (svg, png)
-│   ├── App.tsx          # корневой компонент приложения
-│   ├── App.css          # стили корневого компонента
-│   ├── main.tsx         # точка входа React
-│   └── index.css        # глобальные стили
+│   ├── app/                 # инициализация приложения, глобальные стили
+│   │   ├── App.tsx          # корневой компонент
+│   │   └── styles/
+│   │       └── global.css
+│   ├── pages/               # страницы (экраны)
+│   │   ├── auth/
+│   │   │   └── AuthPage.tsx
+│   │   ├── workouts/
+│   │   │   └── WorkoutsPage.tsx
+│   │   ├── nutrition/
+│   │   │   └── NutritionPage.tsx
+│   │   └── measurements/
+│   │       └── MeasurementsPage.tsx
+│   ├── components/          # переиспользуемые UI-компоненты
+│   │   ├── AppLayout/
+│   │   │   ├── AppLayout.tsx
+│   │   │   └── index.ts
+│   │   ├── AppNav/
+│   │   ├── AuthInit/
+│   │   ├── GuestRoute/
+│   │   ├── ProtectedRoute/
+│   │   ├── RouteLoading/
+│   │   └── chat/
+│   │       ├── ChatDiaryPage/
+│   │       └── ChatMessage/
+│   ├── services/            # API-клиенты, работа с данными
+│   ├── hooks/               # кастомные React-хуки
+│   ├── utils/               # чистые утилиты
+│   ├── types/               # общие TypeScript-типы
+│   ├── constants/           # константы приложения
+│   └── main.tsx             # точка входа React
 ├── index.html           # HTML-оболочка, монтирует #root
 ├── vite.config.ts       # конфигурация Vite
 ├── tsconfig.json        # корневой TS-конфиг (project references)
 ├── tsconfig.app.json    # TS для src/
 ├── tsconfig.node.json   # TS для vite.config.ts
 ├── .npmrc               # registry=https://registry.npmjs.org/ (перекрывает глобальный)
-├── .oxlintrc.json       # правила линтера
+├── .prettierrc.json     # правила Prettier
+├── eslint.config.js     # ESLint flat config
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml   # CI: сборка и деплой на GitHub Pages
+│       ├── deploy.yml   # CI: сборка и деплой на GitHub Pages
+│       └── lint.yml     # CI: lint + typecheck/build
 ├── AGENTS.md            # этот файл — документация для агентов
 └── README.md            # краткая документация для людей
 ```
 
-При росте проекта ожидаемые каталоги (добавляй и документируй по мере появления):
+### Слои FSD (упрощённый)
 
-- `src/components/` — переиспользуемые UI-компоненты
-- `src/pages/` — страницы / экраны
-- `src/hooks/` — кастомные React-хуки
-- `src/api/` — клиент API и типы запросов/ответов
-- `src/store/` — глобальное состояние
-- `src/types/` — общие TypeScript-типы
-- `src/utils/` — утилиты без UI
+| Слой       | Путь              | Назначение                                         |
+| ---------- | ----------------- | -------------------------------------------------- |
+| app        | `src/app/`        | Корень приложения, провайдеры, global styles       |
+| pages      | `src/pages/`      | Страницы; подпапка на экран (`home/`, `workout/`…) |
+| components | `src/components/` | Общие UI-компоненты                                |
+| services   | `src/services/`   | Запросы к API, работа с backend                    |
+| hooks      | `src/hooks/`      | Переиспользуемая логика React                      |
+| utils      | `src/utils/`      | Чистые функции без React                           |
+| types      | `src/types/`      | Общие TypeScript-типы и интерфейсы                 |
+| constants  | `src/constants/`  | Константы (маршруты, ключи, enum-like значения)    |
+
+**Правила импортов:** слой может импортировать только из слоёв ниже — `app → pages → components`; `services`, `hooks`, `utils`, `types`, `constants` — общие, их можно импортировать откуда угодно. Не импортировать pages из components, services из utils и т.п. `types` и `constants` не импортируют UI-слои.
 
 ## Конвенции кода
 
-- **Компоненты** — функциональные, с хуками; один компонент на файл, имя файла в PascalCase (`WorkoutCard.tsx`).
+- **Компоненты** — функциональные, с хуками; один компонент на папку `ComponentName/` с `ComponentName.tsx`, colocated styles и `index.ts` (re-export).
 - **Импорты** — ES modules; для локальных модулей указывай расширение `.tsx`/`.ts` где требует `verbatimModuleSyntax`.
-- **Стили** — пока colocated CSS (`Component.css` рядом с компонентом); при добавлении CSS-in-JS или Tailwind — обнови этот раздел.
+- **Стили** — SCSS modules (`Component.module.scss` рядом с компонентом); глобальные стили в `src/app/styles/global.scss`.
 - **Типизация** — строгий TypeScript; не используй `any` без явной необходимости и комментария.
 - **Экспорт** — default export для страниц/корневых компонентов; named export для утилит, хуков, типов.
 - **Линтер** — правила React Hooks включены; не отключай правила без согласования.
 
+## UI и дизайн
+
+Ориентир для интерфейса — **мобильный Telegram** (паттерны чата, а не копирование брендинга один в один).
+
+| Область    | Принцип (как в TG)                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| Composer   | Overlay поверх списка (прозрачный фон, сообщения видны под панелью), белое поле с обводкой `#e5e5e5` как у хедера |
+| Поле ввода | Одна строка по умолчанию, авто-рост по мере набора, `Enter` — отправка, `Shift+Enter` — новая строка              |
+| Сообщения  | Пузырьки слева, дата мелким текстом внутри пузыря                                                                 |
+| Выделение  | Long press → режим выбора; composer уезжает вниз (`translateY`); действия в шапке (назад, копировать, удалить)    |
+| Отступы    | Минимальные; учитывать `env(safe-area-inset-bottom)` у нижней панели                                              |
+
+При новых экранах и компонентах чата сначала смотри, как это решено в Telegram, и адаптируй под стек проекта (SCSS modules, существующие токены цветов).
+
 ## Точки входа и маршрутизация
 
-| Файл | Роль |
-|------|------|
-| `index.html` | Загружает `src/main.tsx` |
-| `src/main.tsx` | Монтирует `<App />` в `#root` внутри `StrictMode` |
-| `src/App.tsx` | Корневой компонент (сейчас — стартовый шаблон Vite) |
+| Файл              | Роль                                              |
+| ----------------- | ------------------------------------------------- |
+| `index.html`      | Загружает `src/main.tsx`                          |
+| `src/main.tsx`    | Монтирует `<App />` в `#root` внутри `StrictMode` |
+| `src/app/App.tsx` | Корневой компонент; собирает страницы             |
 
-Маршрутизация **не настроена**. При добавлении React Router (или аналога) опиши здесь таблицу маршрутов и задай `basename={import.meta.env.BASE_URL}`.
+Маршрутизация через **react-router-dom** с `basename={import.meta.env.BASE_URL}`.
+
+| Путь            | Компонент              | Доступ                                          |
+| --------------- | ---------------------- | ----------------------------------------------- |
+| `/`             | redirect → `/workouts` | только авторизованные                           |
+| `/workouts`     | `WorkoutsPage`         | только авторизованные                           |
+| `/nutrition`    | `NutritionPage`        | только авторизованные                           |
+| `/measurements` | `MeasurementsPage`     | только авторизованные                           |
+| `/auth`         | `AuthPage`             | только гости (login/register на одной странице) |
+| `*`             | redirect → `/workouts` | —                                               |
+
+Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с верхней навигацией `AppNav` (Workouts, Nutrition, Measurements + кнопка выхода с иконкой). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
 
 ## Деплой (GitHub Pages)
 
 Сайт публикуется на `https://vanya2535.github.io/gym-diary-frontend/` при push в `main`.
 
-| Компонент | Назначение |
-|-----------|------------|
-| `vite.config.ts` → `base` | Берётся из env `BASE_PATH` (по умолчанию `/`) |
+| Компонент                      | Назначение                                                              |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| `vite.config.ts` → `base`      | Берётся из env `BASE_PATH` (по умолчанию `/`)                           |
 | `.github/workflows/deploy.yml` | Сборка с `BASE_PATH=/gym-diary-frontend/` и деплой через GitHub Actions |
-| `import.meta.env.BASE_URL` | Использовать для путей к файлам из `public/` (иконки, favicon и т.д.) |
+| `import.meta.env.BASE_URL`     | Использовать для путей к файлам из `public/` (иконки, favicon и т.д.)   |
 
 Локальная проверка Pages-сборки: `npm run preview:pages`.
 
@@ -102,30 +168,52 @@ gym-diary-frontend/
 
 ## API и окружение
 
-Backend и переменные окружения **ещё не подключены**.
+Backend: **gym-diary-backend** (Fastify, opaque Bearer token).
+
+### Переменные окружения
+
+| Переменная     | Назначение                           | Пример                  |
+| -------------- | ------------------------------------ | ----------------------- |
+| `VITE_API_URL` | Базовый URL API (без trailing slash) | `http://localhost:3000` |
+
+Шаблон: `.env.example`. Локально скопируй в `.env`.
+
+### Авторизация
+
+| Эндпоинт                                   | Метод            | Auth   | Описание                                     |
+| ------------------------------------------ | ---------------- | ------ | -------------------------------------------- |
+| `/auth/register`                           | POST             | —      | `{ nickname, password }` → `{ token, user }` |
+| `/auth/login`                              | POST             | —      | `{ nickname, password }` → `{ token, user }` |
+| `/auth/me`                                 | GET              | Bearer | `{ user }`                                   |
+| `/workouts`, `/nutrition`, `/measurements` | GET/POST         | Bearer | list/create diary entries                    |
+| `/{resource}/:id`                          | GET/PATCH/DELETE | Bearer | get/update/delete entry                      |
+
+Токен хранится в `localStorage` (ключ `gym-diary:auth-token`). Запросы с токеном: заголовок `Authorization: Bearer <token>` (axios interceptor в `api.ts`). Logout — только на клиенте (очистка токена); эндпоинта logout на backend нет.
+
+Diary entries: `{ id, content, authorId, createdAt }`. List API — cursor pagination: `?limit=1..100` (default 20), `?cursor=<id>` для следующей страницы; ответ `{ items, nextCursor }`. Backend отдаёт страницы от новых к старым (`createdAt desc`).
+
+UI — чат (`ChatDiaryPage`): дизайн composer и взаимодействий — по паттернам мобильного Telegram (см. раздел «UI и дизайн»). Первая страница при монтировании, старые сообщения подгружаются при прокрутке вверх через `IntersectionObserver` (sentinel вверху списка). Размер страницы: `DIARY_PAGE_SIZE` (20) в `constants/diary.ts`. **Long press** — первое выделение; далее **клик** переключает выделение. **Клик** без режима выделения — редактирование: контент в textarea, над полем ссылка с первой строкой (скролл к сообщению), Save → `PATCH`. при **≥1** выделенном в `AppNav` скрываются ссылки; слева — «назад», справа — копирование и удаление. → `ConfirmDeleteModal` → один `DELETE /{resource}` с `{ ids }`. Состояние выделения: `hooks/diarySelectionStore.ts`. Сервис: `src/services/diary-entry.ts` (`createDiaryEntryService`, `workoutsService`, `nutritionService`, `measurementsService`).
+
+HTTP-клиент: `src/services/api.ts` (axios instance `apiClient`, обёртка `apiRequest`). Auth: `src/services/auth.ts`, `src/hooks/authStore.ts`, `src/utils/tokenStorage.ts`.
 
 ### npm registry
 
 В корне лежит `.npmrc` с `registry=https://registry.npmjs.org/` — он перекрывает корпоративный registry из глобального конфига. Не удаляй и не меняй без необходимости; после `npm install` в `package-lock.json` все `resolved` должны указывать на `registry.npmjs.org`.
 
-При интеграции с API:
-
-1. Добавь `.env.example` с перечнем переменных (без секретов).
-2. Используй префикс `VITE_` для переменных, доступных клиенту.
-3. Опиши в этом разделе базовый URL, эндпоинты и формат авторизации.
+Для GitHub Pages задай `VITE_API_URL` при сборке (URL Render-бэкенда) и добавь этот origin в `CORS_ORIGINS` на backend.
 
 ## Документация: что обновлять
 
 Любое изменение кода должно сопровождаться актуализацией документации. Минимальный чеклист:
 
-| Изменение | Обновить |
-|-----------|----------|
+| Изменение                              | Обновить                                                              |
+| -------------------------------------- | --------------------------------------------------------------------- |
 | Новая команда npm, скрипт, зависимость | `AGENTS.md` (раздел «Стек», «Команды»), при необходимости `README.md` |
-| Новый каталог, слой архитектуры | `AGENTS.md` (раздел «Структура») |
-| Новые соглашения (стиль, паттерны) | `AGENTS.md` (раздел «Конвенции») |
-| Маршруты, страницы | `AGENTS.md` (раздел «Маршрутизация») |
-| API, env, auth | `AGENTS.md` (раздел «API»), `.env.example` |
-| Пользовательский quick start | `README.md` |
+| Новый каталог, слой архитектуры        | `AGENTS.md` (раздел «Структура»)                                      |
+| Новые соглашения (стиль, паттерны)     | `AGENTS.md` (раздел «Конвенции»)                                      |
+| Маршруты, страницы                     | `AGENTS.md` (раздел «Маршрутизация»)                                  |
+| API, env, auth                         | `AGENTS.md` (раздел «API»), `.env.example`                            |
+| Пользовательский quick start           | `README.md`                                                           |
 
 Не создавай лишние markdown-файлы без запроса пользователя. Держи информацию в `AGENTS.md` (для агентов) и `README.md` (для людей).
 

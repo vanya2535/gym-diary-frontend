@@ -1,0 +1,48 @@
+.root {
+  align-self: flex-start;
+  max-width: min(100%, 36rem);
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+
+  &:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 2px;
+  }
+}
+
+.rootSelected {
+  composes: root;
+  border-color: #111;
+  background: #f3f3f3;
+}
+
+.rootEditing {
+  composes: root;
+  border-color: #111;
+  box-shadow: 0 0 0 1px #111;
+}
+
+.rootSelectable {
+  composes: root;
+  cursor: pointer;
+}
+
+.content {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.date {
+  display: block;
+  margin-top: 0.5rem;
+  color: #888;
+  font-size: 0.75rem;
+  text-align: right;
+}
