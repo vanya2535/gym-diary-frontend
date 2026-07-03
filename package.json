@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:pages": "BASE_PATH=/gym-diary-frontend/ npm run build",
+    "build:pages": "BASE_PATH=/gym-diary-frontend/ npm run build && node scripts/copy-spa-fallback.mjs",
     "lint": "node scripts/lint.mjs",
     "lint:fix": "eslint . --fix && prettier --write .",
     "format": "prettier --write .",

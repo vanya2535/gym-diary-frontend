@@ -169,6 +169,10 @@ gym-diary-frontend/
 | `vite.config.ts` → `base`      | Берётся из env `BASE_PATH` (по умолчанию `/`)                           |
 | `.github/workflows/deploy.yml` | Сборка с `BASE_PATH=/gym-diary-frontend/` и деплой через GitHub Actions |
 | `import.meta.env.BASE_URL`     | Использовать для путей к файлам из `public/` (иконки, favicon и т.д.)   |
+| `scripts/copy-spa-fallback.mjs`| После `build:pages` копирует `index.html` → `404.html` (SPA deep links) |
+| `public/manifest.webmanifest`  | `start_url: "."` — «Добавить на экран» открывает корень репозитория, не `/auth` |
+
+GitHub Pages не знает client-side маршруты (`/auth`, `/workouts` …). Без `404.html` прямой заход или иконка на главном экране с URL вида `…/gym-diary-frontend/auth` отдаёт 404. `404.html` (копия `index.html`) загружает SPA, React Router с `basename={import.meta.env.BASE_URL}` обрабатывает путь.
 
 Локальная проверка Pages-сборки: `npm run preview:pages`.
 
