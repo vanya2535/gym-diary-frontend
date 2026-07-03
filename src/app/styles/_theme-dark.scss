@@ -1,0 +1,30 @@
+@mixin tokens {
+  color-scheme: dark;
+
+  --color-bg-page: #0e0e0e;
+  --color-bg-surface: #1a1a1a;
+  --color-bg-surface-muted: #262626;
+  --color-bg-subtle: rgb(255 255 255 / 8%);
+  --color-bg-subtle-hover: rgb(255 255 255 / 12%);
+  --color-bg-overlay: rgb(0 0 0 / 60%);
+
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #c4c4c4;
+  --color-text-muted: #999;
+  --color-text-subtle: #888;
+  --color-text-hint: #777;
+  --color-text-placeholder: #666;
+
+  --color-border: #2e2e2e;
+  --color-border-soft: #333;
+  --color-border-control: #444;
+  --color-border-strong: #e8e8e8;
+  --color-border-focus: #555;
+
+  --color-accent: #e8e8e8;
+  --color-accent-fg: #111;
+
+  --color-danger: #ff6b7a;
+  --color-danger-hover: #ff8591;
+  --color-danger-fg: #111;
+}

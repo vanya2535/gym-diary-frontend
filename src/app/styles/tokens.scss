@@ -1,0 +1,20 @@
+@use 'theme-light' as light;
+@use 'theme-dark' as dark;
+
+:root {
+  @include light.tokens;
+}
+
+[data-theme='light'] {
+  @include light.tokens;
+}
+
+[data-theme='dark'] {
+  @include dark.tokens;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark.tokens;
+  }
+}

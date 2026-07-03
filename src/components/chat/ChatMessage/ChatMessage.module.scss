@@ -2,30 +2,30 @@
   align-self: flex-start;
   max-width: min(100%, 36rem);
   padding: 0.75rem 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border-soft);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--color-bg-surface);
   cursor: pointer;
   user-select: none;
   touch-action: manipulation;
   -webkit-touch-callout: none;
 
   &:focus-visible {
-    outline: 2px solid #111;
+    outline: 2px solid var(--color-border-strong);
     outline-offset: 2px;
   }
 }
 
 .rootSelected {
   composes: root;
-  border-color: #111;
-  background: #f3f3f3;
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-surface-muted);
 }
 
 .rootEditing {
   composes: root;
-  border-color: #111;
-  box-shadow: 0 0 0 1px #111;
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 1px var(--color-border-strong);
 }
 
 .rootSelectable {
@@ -42,7 +42,7 @@
 .date {
   display: block;
   margin-top: 0.5rem;
-  color: #888;
+  color: var(--color-text-hint);
   font-size: 0.75rem;
   text-align: right;
 }

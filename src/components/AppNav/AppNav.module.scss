@@ -9,8 +9,8 @@ $header-control-height: 2.25rem;
   box-sizing: border-box;
   height: calc(#{$header-padding-block} * 2 + #{$header-control-height});
   padding: $header-padding-block 1.25rem;
-  border-bottom: 1px solid #e5e5e5;
-  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
 }
 
 .links {
@@ -35,17 +35,17 @@ $header-control-height: 2.25rem;
   text-decoration: none;
 
   &:hover {
-    background: #f3f3f3;
+    background: var(--color-bg-surface-muted);
   }
 }
 
 .linkActive {
   composes: link;
-  background: #111;
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
 
   &:hover {
-    background: #111;
+    background: var(--color-accent);
   }
 }
 
@@ -59,7 +59,7 @@ $header-control-height: 2.25rem;
   width: $header-control-height;
   height: $header-control-height;
   padding: 0;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border-control);
   border-radius: 0.375rem;
   background: transparent;
   color: inherit;
@@ -67,7 +67,7 @@ $header-control-height: 2.25rem;
   transform: translateY(-50%);
 
   &:hover {
-    border-color: #111;
+    border-color: var(--color-border-strong);
   }
 }
 
@@ -96,12 +96,12 @@ $header-control-height: 2.25rem;
   composes: logout;
   position: static;
   transform: none;
-  border-color: #b00020;
-  color: #b00020;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 
   &:hover {
-    border-color: #8f001a;
-    color: #8f001a;
+    border-color: var(--color-danger-hover);
+    color: var(--color-danger-hover);
   }
 }
 
