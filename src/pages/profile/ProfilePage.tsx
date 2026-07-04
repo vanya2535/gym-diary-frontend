@@ -161,12 +161,7 @@ export function ProfilePage() {
             />
 
             {!singleGoal ? (
-              <BjuInput
-                id="rest-bju"
-                label="Отдых"
-                value={restInput}
-                onChange={setRestInput}
-              />
+              <BjuInput id="rest-bju" label="Отдых" value={restInput} onChange={setRestInput} />
             ) : null}
           </section>
 

@@ -166,7 +166,15 @@ export function ChatDiaryPage({ service, nutrition }: ChatDiaryPageProps) {
     return () => {
       observer.disconnect()
     }
-  }, [fieldError, submitError, editingEntryId, selectedIds.length, nutrition?.showDayTypeSelector, isComposerFocused, content])
+  }, [
+    fieldError,
+    submitError,
+    editingEntryId,
+    selectedIds.length,
+    nutrition?.showDayTypeSelector,
+    isComposerFocused,
+    content,
+  ])
 
   useEffect(() => {
     if (selectedIds.length > 0) {
@@ -238,7 +246,9 @@ export function ChatDiaryPage({ service, nutrition }: ChatDiaryPageProps) {
         }
       })
     } catch (error) {
-      setLoadMoreError(error instanceof Error ? error.message : 'Не удалось загрузить более ранние сообщения')
+      setLoadMoreError(
+        error instanceof Error ? error.message : 'Не удалось загрузить более ранние сообщения',
+      )
     } finally {
       isLoadingMoreRef.current = false
       setIsLoadingMore(false)
@@ -430,7 +440,9 @@ export function ChatDiaryPage({ service, nutrition }: ChatDiaryPageProps) {
       <div ref={messagesRef} className={styles.messages}>
         {hasMore ? <div ref={loadMoreSentinelRef} className={styles.loadMoreSentinel} /> : null}
 
-        {isLoadingMore ? <p className={styles.loadMoreStatus}>Загрузка более ранних сообщений…</p> : null}
+        {isLoadingMore ? (
+          <p className={styles.loadMoreStatus}>Загрузка более ранних сообщений…</p>
+        ) : null}
 
         {!isLoadingMore && loadMoreError ? (
           <div className={styles.loadMoreError}>

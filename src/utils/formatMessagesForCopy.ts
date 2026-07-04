@@ -6,6 +6,10 @@ export function formatMessagesForCopy(entries: DiaryEntry[]): string {
     (left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
   )
 
+  if (sorted.length === 1) {
+    return sorted[0]!.content
+  }
+
   return sorted
     .map((entry) => {
       const dateLabel = formatMessageDate(entry.createdAt)

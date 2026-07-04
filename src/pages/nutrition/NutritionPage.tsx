@@ -3,7 +3,10 @@ import { ChatDiaryPage } from '../../components/chat/ChatDiaryPage/index.ts'
 import { getNutritionGoals } from '../../services/nutrition-goals.ts'
 import { nutritionService } from '../../services/nutrition-entry.ts'
 import type { NutritionGoals } from '../../types/nutrition.ts'
-import { hasConfiguredNutritionGoals, shouldShowNutritionDayTypeSelector } from '../../types/nutrition.ts'
+import {
+  hasConfiguredNutritionGoals,
+  shouldShowNutritionDayTypeSelector,
+} from '../../types/nutrition.ts'
 
 export function NutritionPage() {
   const [goals, setGoals] = useState<NutritionGoals | null>(null)
