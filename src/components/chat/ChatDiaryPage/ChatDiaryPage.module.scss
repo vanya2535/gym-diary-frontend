@@ -87,9 +87,10 @@
 }
 
 .composer {
+  --field-font-size: 1rem;
   --field-line-height: 1.25rem;
-  --action-inset: 0.3125rem;
-  --action-size: 2rem;
+  --action-inset: 0.375rem;
+  --action-size: 2.25rem;
   --field-min-height: calc(var(--action-size) + var(--action-inset) * 2);
   position: absolute;
   right: 0;
@@ -99,8 +100,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding: 0.375rem 0.5rem;
-  padding-bottom: calc(0.375rem + env(safe-area-inset-bottom, 0px));
+  padding-top: 0.375rem;
+  padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
   background: transparent;
   pointer-events: none;
 
@@ -143,7 +146,7 @@
   border: none;
   background: none;
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--field-font-size);
   line-height: var(--field-line-height);
   text-align: left;
   text-decoration: none;
@@ -222,11 +225,16 @@
   border-radius: 1.125rem;
   background: var(--color-bg-surface);
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--field-font-size);
   line-height: var(--field-line-height);
   resize: none;
   overflow-y: auto;
   field-sizing: content;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   &::placeholder {
     color: var(--color-text-placeholder);

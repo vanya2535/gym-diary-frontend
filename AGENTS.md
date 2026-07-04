@@ -117,13 +117,12 @@ gym-diary-frontend/
 
 Ориентир для интерфейса — **мобильный Telegram** (паттерны чата, а не копирование брендинга один в один).
 
-| Область    | Принцип (как в TG)                                                                                             |
-| ---------- | -------------------------------------------------------------------------------------------------------------- |
-| Composer   | Overlay поверх списка (прозрачный фон, сообщения видны под панелью), поле с обводкой `var(--color-border)`     |
-| Поле ввода | Одна строка по умолчанию, авто-рост по мере набора, `Enter` — отправка, `Shift+Enter` — новая строка           |
-| Сообщения  | Пузырьки слева, дата мелким текстом внутри пузыря                                                              |
-| Выделение  | Long press → режим выбора; composer уезжает вниз (`translateY`); действия в шапке (назад, копировать, удалить) |
-| Отступы    | Минимальные; учитывать `env(safe-area-inset-bottom)` у нижней панели                                           |
+| Область    | Принцип (как в TG)                                                                                         |
+| ---------- | ---------------------------------------------------------------------------------------------------------- |
+| Composer   | Overlay поверх списка (прозрачный фон, сообщения видны под панелью), поле с обводкой `var(--color-border)` |
+| Навигация  | Сайдбар слева (кнопка меню в хедере); заголовок — текущий раздел; Sign out в сайдбаре                      |
+| Поле ввода | `font-size: 1rem` (≥16px — без зума iOS Safari); Enter → отправка только на desktop; на touch — перенос строки и кнопка отправки |
+| Отступы    | `viewport-fit=cover`; `env(safe-area-inset-*)` у хедера и composer                                         |
 
 При новых экранах и компонентах чата сначала смотри, как это решено в Telegram, и адаптируй под стек проекта (SCSS modules, токены `--color-*`).
 
@@ -158,19 +157,19 @@ gym-diary-frontend/
 | `/auth`         | `AuthPage`             | только гости (login/register на одной странице) |
 | `*`             | redirect → `/workouts` | —                                               |
 
-Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с верхней навигацией `AppNav` (Workouts, Nutrition, Measurements + кнопка выхода с иконкой). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
+Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с `AppNav`: кнопка меню → сайдbar (Workouts, Nutrition, Measurements, Sign out). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
 
 ## Деплой (GitHub Pages)
 
 Сайт публикуется на `https://vanya2535.github.io/gym-diary-frontend/` при push в `main`.
 
-| Компонент                      | Назначение                                                              |
-| ------------------------------ | ----------------------------------------------------------------------- |
-| `vite.config.ts` → `base`      | Берётся из env `BASE_PATH` (по умолчанию `/`)                           |
-| `.github/workflows/deploy.yml` | Сборка с `BASE_PATH=/gym-diary-frontend/`, `VITE_API_URL` (Render backend), деплой через GitHub Actions |
-| `import.meta.env.BASE_URL`     | Использовать для путей к файлам из `public/` (иконки, favicon и т.д.)   |
-| `scripts/copy-spa-fallback.mjs`| После `build:pages` копирует `index.html` → `404.html` (SPA deep links) |
-| `public/manifest.webmanifest`  | `start_url: "."` — «Добавить на экран» открывает корень репозитория, не `/auth` |
+| Компонент                       | Назначение                                                                                              |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `vite.config.ts` → `base`       | Берётся из env `BASE_PATH` (по умолчанию `/`)                                                           |
+| `.github/workflows/deploy.yml`  | Сборка с `BASE_PATH=/gym-diary-frontend/`, `VITE_API_URL` (Render backend), деплой через GitHub Actions |
+| `import.meta.env.BASE_URL`      | Использовать для путей к файлам из `public/` (иконки, favicon и т.д.)                                   |
+| `scripts/copy-spa-fallback.mjs` | После `build:pages` копирует `index.html` → `404.html` (SPA deep links)                                 |
+| `public/manifest.webmanifest`   | `start_url: "."` — «Добавить на экран» открывает корень репозитория, не `/auth`                         |
 
 GitHub Pages не знает client-side маршруты (`/auth`, `/workouts` …). Без `404.html` прямой заход или иконка на главном экране с URL вида `…/gym-diary-frontend/auth` отдаёт 404. `404.html` (копия `index.html`) загружает SPA, React Router с `basename={import.meta.env.BASE_URL}` обрабатывает путь.
 
@@ -188,8 +187,8 @@ Backend: **gym-diary-backend** (Fastify, opaque Bearer token).
 
 ### Переменные окружения
 
-| Переменная     | Назначение                           | Пример                                                |
-| -------------- | ------------------------------------ | ----------------------------------------------------- |
+| Переменная     | Назначение                           | Пример                                                                         |
+| -------------- | ------------------------------------ | ------------------------------------------------------------------------------ |
 | `VITE_API_URL` | Базовый URL API (без trailing slash) | `http://localhost:3000` (dev), `https://gym-diary-backend.onrender.com` (prod) |
 
 Шаблон: `.env.example`. Локально скопируй в `.env`.
@@ -212,7 +211,7 @@ Backend: **gym-diary-backend** (Fastify, opaque Bearer token).
 
 Diary entries: `{ id, content, authorId, createdAt }`. List API — cursor pagination: `?limit=1..100` (default 20), `?cursor=<id>` для следующей страницы; ответ `{ items, nextCursor }`. Backend отдаёт страницы от новых к старым (`createdAt desc`).
 
-UI — чат (`ChatDiaryPage`): дизайн composer и взаимодействий — по паттернам мобильного Telegram (см. раздел «UI и дизайн»). Первая страница при монтировании, старые сообщения подгружаются при прокрутке вверх через `IntersectionObserver` (sentinel вверху списка). Размер страницы: `DIARY_PAGE_SIZE` (20) в `constants/diary.ts`. **Long press** — первое выделение; далее **клик** переключает выделение. **Клик** без режима выделения — редактирование: контент в textarea, над полем ссылка с первой строкой (скролл к сообщению), Save → `PATCH`. при **≥1** выделенном в `AppNav` скрываются ссылки; слева — «назад», справа — копирование и удаление. → `ConfirmDeleteModal` → один `DELETE /{resource}` с `{ ids }`. Состояние выделения: `hooks/diarySelectionStore.ts`. Сервис: `src/services/diary-entry.ts` (`createDiaryEntryService`, `workoutsService`, `nutritionService`, `measurementsService`).
+UI — чат (`ChatDiaryPage`): дизайн composer и взаимодействий — по паттернам мобильного Telegram (см. раздел «UI и дизайн»). Первая страница при монтировании, старые сообщения подгружаются при прокрутке вверх через `IntersectionObserver` (sentinel вверху списка). Размер страницы: `DIARY_PAGE_SIZE` (20) в `constants/diary.ts`. **Long press** — первое выделение; далее **клик** переключает выделение. **Клик** без режима выделения — редактирование: контент в textarea, над полем ссылка с первой строкой (скролл к сообщению), Save → `PATCH`. при **≥1** выделенном в `AppNav`: слева — «назад», справа — копирование и удаление (меню скрыто). → `ConfirmDeleteModal` → один `DELETE /{resource}` с `{ ids }`. Состояние выделения: `hooks/diarySelectionStore.ts`. Сервис: `src/services/diary-entry.ts` (`createDiaryEntryService`, `workoutsService`, `nutritionService`, `measurementsService`).
 
 HTTP-клиент: `src/services/api.ts` (axios instance `apiClient`, обёртка `apiRequest`). Auth: `src/services/auth.ts`, `src/hooks/authStore.ts`, `src/utils/tokenStorage.ts`.
 
@@ -226,14 +225,14 @@ HTTP-клиент: `src/services/api.ts` (axios instance `apiClient`, обёрт
 
 Любое изменение кода должно сопровождаться актуализацией документации. Минимальный чеклист:
 
-| Изменение                              | Обновить                                                              |
-| -------------------------------------- | --------------------------------------------------------------------- |
+| Изменение                              | Обновить                                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Новая команда npm, скрипт, зависимость | `AGENTS.md` (раздел «Стек», «Команды», «Зависимости (npm)»), при необходимости `README.md` |
-| Новый каталог, слой архитектуры        | `AGENTS.md` (раздел «Структура»)                                      |
-| Новые соглашения (стиль, паттерны)     | `AGENTS.md` (раздел «Конвенции»)                                      |
-| Маршруты, страницы                     | `AGENTS.md` (раздел «Маршрутизация»)                                  |
-| API, env, auth                         | `AGENTS.md` (раздел «API»), `.env.example`                            |
-| Пользовательский quick start           | `README.md`                                                           |
+| Новый каталог, слой архитектуры        | `AGENTS.md` (раздел «Структура»)                                                           |
+| Новые соглашения (стиль, паттерны)     | `AGENTS.md` (раздел «Конвенции»)                                                           |
+| Маршруты, страницы                     | `AGENTS.md` (раздел «Маршрутизация»)                                                       |
+| API, env, auth                         | `AGENTS.md` (раздел «API»), `.env.example`                                                 |
+| Пользовательский quick start           | `README.md`                                                                                |
 
 Не создавай лишние markdown-файлы без запроса пользователя. Держи информацию в `AGENTS.md` (для агентов) и `README.md` (для людей).
 

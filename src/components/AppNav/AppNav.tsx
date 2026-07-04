@@ -1,9 +1,29 @@
-import { NavLink } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal/index.ts'
 import { NAV_ITEMS } from '../../constants/navigation.ts'
 import { useAuthStore } from '../../hooks/authStore.ts'
 import { useDiarySelectionStore } from '../../hooks/diarySelectionStore.ts'
 import styles from './AppNav.module.scss'
+
+function MenuIcon() {
+  return (
+    <svg
+      className={styles.actionIcon}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="18" x2="20" y2="18" />
+    </svg>
+  )
+}
 
 function BackIcon() {
   return (
@@ -80,66 +100,129 @@ function DeleteIcon() {
 }
 
 export function AppNav() {
+  const location = useLocation()
   const logout = useAuthStore((state) => state.logout)
   const selectedCount = useDiarySelectionStore((state) => state.selectedIds.length)
   const openConfirm = useDiarySelectionStore((state) => state.openConfirm)
   const clearSelection = useDiarySelectionStore((state) => state.clearSelection)
   const copySelected = useDiarySelectionStore((state) => state.copySelected)
   const isSelectionActive = selectedCount > 0
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const currentTitle = NAV_ITEMS.find((item) => location.pathname === item.to)?.label ?? 'Gym Diary'
+
+  useEffect(() => {
+    if (!isSidebarOpen) {
+      return
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isSidebarOpen])
 
   return (
-    <header className={styles.root}>
-      {isSelectionActive ? (
-        <button
-          className={styles.back}
-          type="button"
-          aria-label="Clear selection"
-          onClick={clearSelection}
-        >
-          <BackIcon />
-        </button>
+    <>
+      <header className={styles.root}>
+        {isSelectionActive ? (
+          <button
+            className={styles.iconButton}
+            type="button"
+            aria-label="Clear selection"
+            onClick={clearSelection}
+          >
+            <BackIcon />
+          </button>
+        ) : (
+          <button
+            className={styles.iconButton}
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={isSidebarOpen}
+            aria-controls="app-sidebar"
+            onClick={() => setIsSidebarOpen(true)}
+          >
+            <MenuIcon />
+          </button>
+        )}
+
+        <h1 className={styles.title}>{isSelectionActive ? 'Selected' : currentTitle}</h1>
+
+        {isSelectionActive ? (
+          <div className={styles.selectionActions}>
+            <button
+              className={styles.iconButton}
+              type="button"
+              aria-label={`Copy ${selectedCount} messages`}
+              onClick={() => void copySelected()}
+            >
+              <CopyIcon />
+            </button>
+            <button
+              className={`${styles.iconButton} ${styles.delete}`}
+              type="button"
+              aria-label={`Delete ${selectedCount} messages`}
+              onClick={openConfirm}
+            >
+              <DeleteIcon />
+            </button>
+          </div>
+        ) : (
+          <div className={styles.headerSpacer} aria-hidden="true" />
+        )}
+      </header>
+
+      {isSidebarOpen ? (
+        <div
+          className={styles.backdrop}
+          role="presentation"
+          onClick={() => setIsSidebarOpen(false)}
+        />
       ) : null}
 
-      {!isSelectionActive ? (
-        <nav className={styles.links} aria-label="Main navigation">
+      <aside
+        id="app-sidebar"
+        className={isSidebarOpen ? styles.sidebarOpen : styles.sidebar}
+        aria-hidden={!isSidebarOpen}
+        aria-label="Main navigation"
+      >
+        <nav className={styles.sidebarNav}>
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
-              className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
+              className={({ isActive }) =>
+                isActive ? styles.sidebarLinkActive : styles.sidebarLink
+              }
+              onClick={() => setIsSidebarOpen(false)}
             >
               {item.label}
             </NavLink>
           ))}
         </nav>
-      ) : null}
 
-      {isSelectionActive ? (
-        <div className={styles.selectionActions}>
-          <button
-            className={styles.copy}
-            type="button"
-            aria-label={`Copy ${selectedCount} messages`}
-            onClick={() => void copySelected()}
-          >
-            <CopyIcon />
-          </button>
-          <button
-            className={styles.delete}
-            type="button"
-            aria-label={`Delete ${selectedCount} messages`}
-            onClick={openConfirm}
-          >
-            <DeleteIcon />
-          </button>
-        </div>
-      ) : (
-        <button className={styles.logout} type="button" aria-label="Sign out" onClick={logout}>
+        <button
+          className={styles.sidebarLogout}
+          type="button"
+          onClick={() => {
+            setIsSidebarOpen(false)
+            logout()
+          }}
+        >
           <LogoutIcon />
+          Sign out
         </button>
-      )}
+      </aside>
 
       <ConfirmDeleteModal />
-    </header>
+    </>
   )
 }

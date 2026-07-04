@@ -37,6 +37,10 @@ function scrollMessagesToBottom(
   container.scrollTo({ top: container.scrollHeight, behavior })
 }
 
+function isEnterToSendEnabled() {
+  return window.matchMedia('(hover: hover) and (pointer: fine)').matches
+}
+
 function scrollToMessage(container: HTMLDivElement | null, messageId: string) {
   const element = container?.querySelector(`#message-${CSS.escape(messageId)}`)
 
@@ -341,10 +345,16 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      void submitMessage()
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) {
+      return
     }
+
+    if (!isEnterToSendEnabled()) {
+      return
+    }
+
+    event.preventDefault()
+    void submitMessage()
   }
 
   const showEmptyState = !isInitialLoading && !loadError && entries.length === 0
