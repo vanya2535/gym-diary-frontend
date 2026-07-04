@@ -6,6 +6,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overscroll-behavior-x: none;
+}
+
 body {
   margin: 0;
   background: var(--color-bg-page);
@@ -13,8 +17,11 @@ body {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
 }
 
 #root {
   min-height: 100svh;
+  overscroll-behavior-x: none;
 }

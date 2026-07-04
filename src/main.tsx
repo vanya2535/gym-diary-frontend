@@ -5,4 +5,4 @@ import './app/styles/global.scss'
 
 initTheme()
 
-createRoot(document.getElementById('root')!).render(<App />)
+createRoot(document.getElementById('root')).render(<App />)

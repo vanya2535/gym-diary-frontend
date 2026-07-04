@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal/index.ts'
 import { NAV_ITEMS } from '../../constants/navigation.ts'
 import { useAuthStore } from '../../hooks/authStore.ts'
 import { useDiarySelectionStore } from '../../hooks/diarySelectionStore.ts'
+import { useSidebarSwipe } from '../../hooks/useSidebarSwipe.ts'
 import styles from './AppNav.module.scss'
 
 function MenuIcon() {
@@ -109,6 +110,16 @@ export function AppNav() {
   const isSelectionActive = selectedCount > 0
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  const openSidebar = useCallback(() => setIsSidebarOpen(true), [])
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), [])
+
+  useSidebarSwipe({
+    enabled: !isSelectionActive,
+    isOpen: isSidebarOpen,
+    onOpen: openSidebar,
+    onClose: closeSidebar,
+  })
+
   const currentTitle = NAV_ITEMS.find((item) => location.pathname === item.to)?.label ?? 'Gym Diary'
 
   useEffect(() => {
@@ -118,7 +129,7 @@ export function AppNav() {
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setIsSidebarOpen(false)
+        closeSidebar()
       }
     }
 
@@ -127,7 +138,7 @@ export function AppNav() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isSidebarOpen])
+  }, [isSidebarOpen, closeSidebar])
 
   return (
     <>
@@ -148,7 +159,7 @@ export function AppNav() {
             aria-label="Open menu"
             aria-expanded={isSidebarOpen}
             aria-controls="app-sidebar"
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={openSidebar}
           >
             <MenuIcon />
           </button>
@@ -181,11 +192,7 @@ export function AppNav() {
       </header>
 
       {isSidebarOpen ? (
-        <div
-          className={styles.backdrop}
-          role="presentation"
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <div className={styles.backdrop} role="presentation" onClick={closeSidebar} />
       ) : null}
 
       <aside
@@ -202,7 +209,7 @@ export function AppNav() {
               className={({ isActive }) =>
                 isActive ? styles.sidebarLinkActive : styles.sidebarLink
               }
-              onClick={() => setIsSidebarOpen(false)}
+              onClick={closeSidebar}
             >
               {item.label}
             </NavLink>
@@ -213,7 +220,7 @@ export function AppNav() {
           className={styles.sidebarLogout}
           type="button"
           onClick={() => {
-            setIsSidebarOpen(false)
+            closeSidebar()
             logout()
           }}
         >
