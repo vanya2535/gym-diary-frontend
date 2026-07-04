@@ -7,6 +7,7 @@ import { ROUTES } from '../constants/routes.ts'
 import { AuthPage } from '../pages/auth/AuthPage.tsx'
 import { MeasurementsPage } from '../pages/measurements/MeasurementsPage.tsx'
 import { NutritionPage } from '../pages/nutrition/NutritionPage.tsx'
+import { ProfilePage } from '../pages/profile/ProfilePage.tsx'
 import { WorkoutsPage } from '../pages/workouts/WorkoutsPage.tsx'
 
 export function App() {
@@ -20,6 +21,7 @@ export function App() {
             <Route path={ROUTES.workouts} element={<WorkoutsPage />} />
             <Route path={ROUTES.nutrition} element={<NutritionPage />} />
             <Route path={ROUTES.measurements} element={<MeasurementsPage />} />
+            <Route path={ROUTES.profile} element={<ProfilePage />} />
           </Route>
         </Route>
 

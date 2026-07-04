@@ -22,7 +22,7 @@ apiClient.interceptors.request.use((config) => {
 })
 
 type ApiRequestOptions = {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   token?: string | null
   body?: unknown
 }

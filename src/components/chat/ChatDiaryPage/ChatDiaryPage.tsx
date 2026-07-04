@@ -10,16 +10,25 @@ import {
 import { DIARY_PAGE_SIZE } from '../../../constants/diary.ts'
 import { useDiarySelectionStore } from '../../../hooks/diarySelectionStore.ts'
 import type { createDiaryEntryService } from '../../../services/diary-entry.ts'
+import type { nutritionService } from '../../../services/nutrition-entry.ts'
 import type { DiaryEntry } from '../../../types/diary-entry.ts'
+import type { NutritionDayType, NutritionEntry, NutritionGoals } from '../../../types/nutrition.ts'
 import { formatMessagesForCopy } from '../../../utils/formatMessagesForCopy.ts'
 import { getMessageFirstLine } from '../../../utils/getMessageFirstLine.ts'
 import { ChatMessage } from '../ChatMessage/index.ts'
 import styles from './ChatDiaryPage.module.scss'
 
-type DiaryService = ReturnType<typeof createDiaryEntryService>
+type DiaryService = ReturnType<typeof createDiaryEntryService> | typeof nutritionService
+
+type NutritionComposerConfig = {
+  goals: NutritionGoals
+  showDayTypeSelector: boolean
+  singleGoalAutoApply: boolean
+}
 
 type ChatDiaryPageProps = {
   service: DiaryService
+  nutrition?: NutritionComposerConfig
 }
 
 function toChronological(items: DiaryEntry[]): DiaryEntry[] {
@@ -56,10 +65,13 @@ function resizeTextarea(textarea: HTMLTextAreaElement | null) {
   textarea.style.height = `${textarea.scrollHeight}px`
 }
 
-export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
+export function ChatDiaryPage({ service, nutrition }: ChatDiaryPageProps) {
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [content, setContent] = useState('')
+  const [isComposerFocused, setIsComposerFocused] = useState(false)
+  const [nutritionDayType, setNutritionDayType] = useState<NutritionDayType | null>(null)
+  const [applyProfileGoal, setApplyProfileGoal] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -154,7 +166,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
     return () => {
       observer.disconnect()
     }
-  }, [fieldError, submitError, editingEntryId, selectedIds.length])
+  }, [fieldError, submitError, editingEntryId, selectedIds.length, nutrition?.showDayTypeSelector, isComposerFocused, content])
 
   useEffect(() => {
     if (selectedIds.length > 0) {
@@ -261,11 +273,54 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
     setReloadNonce((current) => current + 1)
   }
 
+  function resetNutritionComposerState() {
+    setNutritionDayType(null)
+    setApplyProfileGoal(false)
+  }
+
+  function handleNutritionDayTypeChange(nextDayType: NutritionDayType) {
+    setNutritionDayType((current) => {
+      if (current === nextDayType) {
+        setApplyProfileGoal(false)
+        return null
+      }
+
+      setApplyProfileGoal(true)
+      return nextDayType
+    })
+  }
+
+  function buildSubmitPayload(trimmedContent: string) {
+    if (!nutrition) {
+      return { content: trimmedContent }
+    }
+
+    if (nutrition.singleGoalAutoApply) {
+      return {
+        content: trimmedContent,
+        applyProfileGoal: true,
+      }
+    }
+
+    return {
+      content: trimmedContent,
+      dayType: nutritionDayType,
+      applyProfileGoal: applyProfileGoal && nutritionDayType !== null,
+    }
+  }
+
   function startEditing(entry: DiaryEntry) {
     setEditingEntryId(entry.id)
     setContent(entry.content)
     setFieldError(null)
     setSubmitError(null)
+
+    if (nutrition) {
+      const nutritionEntry = entry as NutritionEntry
+      setNutritionDayType(nutritionEntry.dayType)
+      setApplyProfileGoal(false)
+    }
+
     textareaRef.current?.focus()
   }
 
@@ -274,6 +329,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
     setContent('')
     setFieldError(null)
     setSubmitError(null)
+    resetNutritionComposerState()
     textareaRef.current?.focus()
   }
 
@@ -311,18 +367,22 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
     setIsSubmitting(true)
 
     try {
+      const payload = buildSubmitPayload(content.trim())
+
       if (editingEntryId) {
-        const updated = await service.update(editingEntryId, { content: content.trim() })
+        const updated = await service.update(editingEntryId, payload)
         setEntries((current) =>
           current.map((entry) => (entry.id === editingEntryId ? updated : entry)),
         )
         setEditingEntryId(null)
         setContent('')
+        resetNutritionComposerState()
       } else {
-        const entry = await service.create({ content: content.trim() })
+        const entry = await service.create(payload)
         setEntries((current) => [...current, entry])
         scrollToBottomRef.current = 'smooth'
         setContent('')
+        resetNutritionComposerState()
       }
 
       textareaRef.current?.focus()
@@ -362,6 +422,8 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
   const editingEntry = entries.find((entry) => entry.id === editingEntryId) ?? null
   const isEditing = editingEntry !== null
   const isSelectionMode = selectedIds.length > 0
+  const showDayTypeSelector =
+    nutrition?.showDayTypeSelector && (isComposerFocused || content.trim().length > 0)
 
   return (
     <div ref={rootRef} className={styles.root}>
@@ -452,6 +514,33 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
           </div>
         ) : null}
 
+        {showDayTypeSelector ? (
+          <div className={styles.dayTypeSelector} role="group" aria-label="Тип дня">
+            <button
+              type="button"
+              className={
+                nutritionDayType === 'workout' ? styles.dayTypeButtonActive : styles.dayTypeButton
+              }
+              aria-pressed={nutritionDayType === 'workout'}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => handleNutritionDayTypeChange('workout')}
+            >
+              Тренировка
+            </button>
+            <button
+              type="button"
+              className={
+                nutritionDayType === 'rest' ? styles.dayTypeButtonActive : styles.dayTypeButton
+              }
+              aria-pressed={nutritionDayType === 'rest'}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => handleNutritionDayTypeChange('rest')}
+            >
+              Отдых
+            </button>
+          </div>
+        ) : null}
+
         <div className={styles.inputWrap}>
           <textarea
             ref={textareaRef}
@@ -469,6 +558,8 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
               }
               resizeTextarea(event.target)
             }}
+            onFocus={() => setIsComposerFocused(true)}
+            onBlur={() => setIsComposerFocused(false)}
             onKeyDown={handleKeyDown}
           />
 

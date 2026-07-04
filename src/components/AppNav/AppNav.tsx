@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal/index.ts'
 import { APP_TITLE, NAV_ITEMS } from '../../constants/navigation.ts'
+import { ROUTES } from '../../constants/routes.ts'
 import { useAuthStore } from '../../hooks/authStore.ts'
 import { useDiarySelectionStore } from '../../hooks/diarySelectionStore.ts'
 import { useSidebarSwipe } from '../../hooks/useSidebarSwipe.ts'
@@ -121,7 +122,9 @@ export function AppNav() {
     onClose: closeSidebar,
   })
 
-  const currentTitle = NAV_ITEMS.find((item) => location.pathname === item.to)?.label ?? APP_TITLE
+  const currentTitle =
+    NAV_ITEMS.find((item) => location.pathname === item.to)?.label ??
+    (location.pathname === ROUTES.profile ? 'Профиль' : APP_TITLE)
 
   useEffect(() => {
     if (!isSidebarOpen) {
@@ -217,17 +220,27 @@ export function AppNav() {
           ))}
         </nav>
 
-        <button
-          className={styles.sidebarLogout}
-          type="button"
-          onClick={() => {
-            closeSidebar()
-            logout()
-          }}
-        >
-          <LogoutIcon />
-          Выйти
-        </button>
+        <div className={styles.sidebarFooter}>
+          <NavLink
+            to={ROUTES.profile}
+            className={({ isActive }) => (isActive ? styles.sidebarLinkActive : styles.sidebarLink)}
+            onClick={closeSidebar}
+          >
+            Профиль
+          </NavLink>
+
+          <button
+            className={styles.sidebarLogout}
+            type="button"
+            onClick={() => {
+              closeSidebar()
+              logout()
+            }}
+          >
+            <LogoutIcon />
+            Выйти
+          </button>
+        </div>
       </aside>
 
       <ConfirmDeleteModal />

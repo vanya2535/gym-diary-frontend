@@ -137,11 +137,18 @@ $header-control-height: 2.25rem;
   }
 }
 
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
 .sidebarLogout {
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
-  margin-top: auto;
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-border-control);
   border-radius: 0.5rem;

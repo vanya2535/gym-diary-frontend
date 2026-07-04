@@ -63,5 +63,4 @@ export function createDiaryEntryService(resourcePath: DiaryResourcePath) {
 }
 
 export const workoutsService = createDiaryEntryService('/workouts')
-export const nutritionService = createDiaryEntryService('/nutrition')
 export const measurementsService = createDiaryEntryService('/measurements')

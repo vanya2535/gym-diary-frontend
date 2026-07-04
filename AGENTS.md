@@ -156,10 +156,11 @@ gym-diary-frontend/
 | `/workouts`     | `WorkoutsPage`         | только авторизованные                           |
 | `/nutrition`    | `NutritionPage`        | только авторизованные                           |
 | `/measurements` | `MeasurementsPage`     | только авторизованные                           |
+| `/profile`      | `ProfilePage`          | только авторизованные (цели питания)            |
 | `/auth`         | `AuthPage`             | только гости (login/register на одной странице) |
 | `*`             | redirect → `/workouts` | —                                               |
 
-Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с `AppNav`: кнопка меню → сайдbar (Тренировки, Питание, Замеры, Выйти). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
+Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с `AppNav`: кнопка меню → сайдbar (Тренировки, Питание, Замеры, Профиль, Выйти). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
 
 ## Деплой (GitHub Pages)
 
@@ -213,7 +214,7 @@ Backend: **gym-diary-backend** (Fastify, opaque Bearer token).
 
 Diary entries: `{ id, content, authorId, createdAt }`. List API — cursor pagination: `?limit=1..100` (default 20), `?cursor=<id>` для следующей страницы; ответ `{ items, nextCursor }`. Backend отдаёт страницы от новых к старым (`createdAt desc`).
 
-UI — чат (`ChatDiaryPage`): дизайн composer и взаимодействий — по паттернам мобильного Telegram (см. раздел «UI и дизайн»). Первая страница при монтировании, старые сообщения подгружаются при прокрутке вверх через `IntersectionObserver` (sentinel вверху списка). Размер страницы: `DIARY_PAGE_SIZE` (20) в `constants/diary.ts`. **Long press** — первое выделение; далее **клик** переключает выделение. **Клик** без режима выделения — редактирование: контент в textarea, над полем ссылка с первой строкой (скролл к сообщению), Save → `PATCH`. при **≥1** выделенном в `AppNav`: слева — «назад», справа — копирование и удаление (меню скрыто). → `ConfirmDeleteModal` → один `DELETE /{resource}` с `{ ids }`. Состояние выделения: `hooks/diarySelectionStore.ts`. Сервис: `src/services/diary-entry.ts` (`createDiaryEntryService`, `workoutsService`, `nutritionService`, `measurementsService`).
+UI — чат (`ChatDiaryPage`): дизайн composer и взаимодействий — по паттернам мобильного Telegram (см. раздел «UI и дизайн»). **Питание:** при сохранении бэкенд нормализует БЖУ, добавляет `Итого:` и `Цель:` (из профиля или вручную). Переключатель **Тренировка / Отдых** в composer — если в профиле две цели; без localStorage, выбор каждый раз заново. Одна цель в профиле — переключатель скрыт, цель подставляется автоматически. Профиль: `/profile` → `GET/PUT /profile/nutrition-goals`. Сервис: `src/services/nutrition-entry.ts`. Первая страница при монтировании, старые сообщения подгружаются при прокрутке вверх через `IntersectionObserver` (sentinel вверху списка). Размер страницы: `DIARY_PAGE_SIZE` (20) в `constants/diary.ts`. **Long press** — первое выделение; далее **клик** переключает выделение. **Клик** без режима выделения — редактирование: контент в textarea, над полем ссылка с первой строкой (скролл к сообщению), Save → `PATCH`. при **≥1** выделенном в `AppNav`: слева — «назад», справа — копирование и удаление (меню скрыто). → `ConfirmDeleteModal` → один `DELETE /{resource}` с `{ ids }`. Состояние выделения: `hooks/diarySelectionStore.ts`. Сервис: `src/services/diary-entry.ts` (`createDiaryEntryService`, `workoutsService`, `nutritionService`, `measurementsService`).
 
 HTTP-клиент: `src/services/api.ts` (axios instance `apiClient`, обёртка `apiRequest`). Auth: `src/services/auth.ts`, `src/hooks/authStore.ts`, `src/utils/tokenStorage.ts`.
 
