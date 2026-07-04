@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (!(error instanceof ApiRequestError) || error.status !== 401) {
         set({
-          error: error instanceof Error ? error.message : 'Failed to restore session',
+          error: error instanceof Error ? error.message : 'Не удалось восстановить сессию',
         })
       }
     }
@@ -72,7 +72,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: null,
         status: 'unauthenticated',
         isSubmitting: false,
-        error: error instanceof Error ? error.message : 'Login failed',
+        error: error instanceof Error ? error.message : 'Не удалось войти',
       })
       throw error
     }
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: null,
         status: 'unauthenticated',
         isSubmitting: false,
-        error: error instanceof Error ? error.message : 'Registration failed',
+        error: error instanceof Error ? error.message : 'Не удалось зарегистрироваться',
       })
       throw error
     }

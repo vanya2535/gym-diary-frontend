@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react'
+import { APP_TITLE } from '../../constants/navigation.ts'
 import { useAuthStore } from '../../hooks/authStore.ts'
 import { validateNickname, validatePassword } from '../../utils/authValidation.ts'
 import styles from './AuthPage.module.scss'
@@ -73,12 +74,12 @@ export function AuthPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Gym Diary</h1>
+        <h1 className={styles.title}>{APP_TITLE}</h1>
         <p className={styles.subtitle}>
-          {mode === 'login' ? 'Sign in to your account' : 'Create an account'}
+          {mode === 'login' ? 'Войдите в аккаунт' : 'Создайте аккаунт'}
         </p>
 
-        <div className={styles.tabs} role="tablist" aria-label="Authentication mode">
+        <div className={styles.tabs} role="tablist" aria-label="Режим авторизации">
           <button
             type="button"
             role="tab"
@@ -86,7 +87,7 @@ export function AuthPage() {
             className={mode === 'login' ? styles.tabButtonActive : styles.tabButton}
             onClick={() => switchMode('login')}
           >
-            Sign in
+            Вход
           </button>
           <button
             type="button"
@@ -95,14 +96,14 @@ export function AuthPage() {
             className={mode === 'register' ? styles.tabButtonActive : styles.tabButton}
             onClick={() => switchMode('register')}
           >
-            Register
+            Регистрация
           </button>
         </div>
 
         <form className={styles.form} noValidate onSubmit={handleSubmit}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="nickname">
-              Nickname
+              Никнейм
             </label>
             <input
               id="nickname"
@@ -120,14 +121,14 @@ export function AuthPage() {
               </p>
             ) : (
               <p id="nickname-hint" className={styles.hint}>
-                3–32 characters: letters, numbers, underscore
+                3–32 символа: буквы, цифры, подчёркивания
               </p>
             )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="password">
-              Password
+              Пароль
             </label>
             <input
               id="password"
@@ -149,7 +150,7 @@ export function AuthPage() {
           {error ? <p className={styles.error}>{error}</p> : null}
 
           <button className={styles.submit} type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+            {isSubmitting ? 'Подождите…' : mode === 'login' ? 'Войти' : 'Создать аккаунт'}
           </button>
         </form>
       </div>

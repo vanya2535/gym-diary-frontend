@@ -184,7 +184,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
         }
       } catch (error) {
         if (!cancelled) {
-          setLoadError(error instanceof Error ? error.message : 'Failed to load entries')
+          setLoadError(error instanceof Error ? error.message : 'Не удалось загрузить записи')
         }
       } finally {
         if (!cancelled) {
@@ -226,7 +226,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
         }
       })
     } catch (error) {
-      setLoadMoreError(error instanceof Error ? error.message : 'Failed to load more entries')
+      setLoadMoreError(error instanceof Error ? error.message : 'Не удалось загрузить более ранние сообщения')
     } finally {
       isLoadingMoreRef.current = false
       setIsLoadingMore(false)
@@ -287,11 +287,11 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
     const trimmed = value.trim()
 
     if (!trimmed) {
-      return 'Message cannot be empty'
+      return 'Сообщение не может быть пустым'
     }
 
     if (trimmed.length > 10000) {
-      return 'Message must be at most 10,000 characters'
+      return 'Максимум 10 000 символов'
     }
 
     return null
@@ -331,8 +331,8 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
         error instanceof Error
           ? error.message
           : editingEntryId
-            ? 'Failed to update message'
-            : 'Failed to send message',
+            ? 'Не удалось обновить сообщение'
+            : 'Не удалось отправить сообщение',
       )
     } finally {
       setIsSubmitting(false)
@@ -368,7 +368,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
       <div ref={messagesRef} className={styles.messages}>
         {hasMore ? <div ref={loadMoreSentinelRef} className={styles.loadMoreSentinel} /> : null}
 
-        {isLoadingMore ? <p className={styles.loadMoreStatus}>Loading older messages…</p> : null}
+        {isLoadingMore ? <p className={styles.loadMoreStatus}>Загрузка более ранних сообщений…</p> : null}
 
         {!isLoadingMore && loadMoreError ? (
           <div className={styles.loadMoreError}>
@@ -378,24 +378,24 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
               type="button"
               onClick={() => void loadMoreEntries()}
             >
-              Retry
+              Повторить
             </button>
           </div>
         ) : null}
 
-        {isInitialLoading ? <p className={styles.status}>Loading…</p> : null}
+        {isInitialLoading ? <p className={styles.status}>Загрузка…</p> : null}
 
         {!isInitialLoading && loadError ? (
           <div className={styles.loadError}>
             <p className={styles.loadErrorText}>{loadError}</p>
             <button className={styles.retryButton} type="button" onClick={handleRetry}>
-              Retry
+              Повторить
             </button>
           </div>
         ) : null}
 
         {showEmptyState ? (
-          <p className={styles.status}>No messages yet. Write the first one below.</p>
+          <p className={styles.status}>Пока нет сообщений. Напишите первое ниже.</p>
         ) : null}
 
         {entries.map((entry) => (
@@ -424,7 +424,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
               type="button"
               onClick={handleScrollToEditingMessage}
             >
-              <span className={styles.editLabel}>Editing</span>
+              <span className={styles.editLabel}>Редактирование</span>
               <span className={styles.editPreview}>
                 {getMessageFirstLine(editingEntry.content)}
               </span>
@@ -432,7 +432,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
             <button
               className={styles.cancelEdit}
               type="button"
-              aria-label="Cancel editing"
+              aria-label="Отменить редактирование"
               onClick={cancelEditing}
             >
               <svg
@@ -457,7 +457,7 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
             ref={textareaRef}
             className={fieldError ? styles.textareaInvalid : styles.textarea}
             value={content}
-            placeholder="Message"
+            placeholder="Сообщение"
             rows={1}
             disabled={isSubmitting || isInitialLoading}
             aria-invalid={fieldError ? true : undefined}
@@ -479,11 +479,11 @@ export function ChatDiaryPage({ service }: ChatDiaryPageProps) {
             aria-label={
               isSubmitting
                 ? isEditing
-                  ? 'Saving message'
-                  : 'Sending message'
+                  ? 'Сохранение сообщения'
+                  : 'Отправка сообщения'
                 : isEditing
-                  ? 'Save message'
-                  : 'Send message'
+                  ? 'Сохранить сообщение'
+                  : 'Отправить сообщение'
             }
           >
             {isEditing ? (

@@ -4,7 +4,7 @@
 
 ## Назначение проекта
 
-Frontend-приложение «Gym Diary» — клиентская часть дневника тренировок. Архитектура — упрощённый FSD (Feature-Sliced Design).
+Frontend-приложение «Дневник» — клиентская часть дневника тренировок. Архитектура — упрощённый FSD (Feature-Sliced Design).
 
 ## Стек
 
@@ -126,6 +126,8 @@ gym-diary-frontend/
 
 При новых экранах и компонентах чата сначала смотри, как это решено в Telegram, и адаптируй под стек проекта (SCSS modules, токены `--color-*`).
 
+**Язык интерфейса — русский.** Строки захардкожены в компонентах (без i18n-библиотеки). Название приложения и пункты меню — `src/constants/navigation.ts` (`APP_TITLE`, `NAV_ITEMS`). Даты — `formatMessageDate()` с локалью `ru-RU`. Сообщения об ошибках с API тоже на русском (поле `error`).
+
 ### Тема (светлая / тёмная)
 
 | Файл                               | Назначение                                 |
@@ -157,7 +159,7 @@ gym-diary-frontend/
 | `/auth`         | `AuthPage`             | только гости (login/register на одной странице) |
 | `*`             | redirect → `/workouts` | —                                               |
 
-Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с `AppNav`: кнопка меню → сайдbar (Workouts, Nutrition, Measurements, Sign out). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
+Защита маршрутов: `ProtectedRoute` / `GuestRoute`. Авторизованные страницы обёрнуты в `AppLayout` с `AppNav`: кнопка меню → сайдbar (Тренировки, Питание, Замеры, Выйти). При старте `AuthInit` восстанавливает сессию через `GET /auth/me` по токену из `localStorage`.
 
 ## Деплой (GitHub Pages)
 

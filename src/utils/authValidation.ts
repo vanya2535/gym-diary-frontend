@@ -4,15 +4,15 @@ export function validateNickname(value: string): string | null {
   const trimmed = value.trim()
 
   if (!trimmed) {
-    return 'Nickname is required'
+    return 'Введите никнейм'
   }
 
   if (trimmed.length < 3 || trimmed.length > 32) {
-    return 'Nickname must be 3–32 characters'
+    return 'Никнейм: от 3 до 32 символов'
   }
 
   if (!NICKNAME_PATTERN.test(trimmed)) {
-    return 'Use letters, numbers, and underscore only'
+    return 'Только буквы, цифры и подчёркивания'
   }
 
   return null
@@ -20,15 +20,15 @@ export function validateNickname(value: string): string | null {
 
 export function validatePassword(value: string): string | null {
   if (!value) {
-    return 'Password is required'
+    return 'Введите пароль'
   }
 
   if (value.length < 6) {
-    return 'Password must be at least 6 characters'
+    return 'Пароль: минимум 6 символов'
   }
 
   if (value.length > 128) {
-    return 'Password must be at most 128 characters'
+    return 'Пароль: максимум 128 символов'
   }
 
   return null

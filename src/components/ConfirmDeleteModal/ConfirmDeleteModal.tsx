@@ -1,4 +1,5 @@
 import { useDiarySelectionStore } from '../../hooks/diarySelectionStore.ts'
+import { pluralRu } from '../../utils/pluralRu.ts'
 import styles from './ConfirmDeleteModal.module.scss'
 
 export function ConfirmDeleteModal() {
@@ -14,6 +15,10 @@ export function ConfirmDeleteModal() {
   }
 
   const count = selectedIds.length
+  const deleteMessage =
+    count === 1
+      ? 'Это сообщение будет удалено безвозвратно.'
+      : `${count} ${pluralRu(count, 'сообщение', 'сообщения', 'сообщений')} будет удалено безвозвратно.`
 
   return (
     <div className={styles.overlay} role="presentation" onClick={closeConfirm}>
@@ -25,13 +30,9 @@ export function ConfirmDeleteModal() {
         onClick={(event) => event.stopPropagation()}
       >
         <h2 id="confirm-delete-title" className={styles.title}>
-          Delete messages?
+          Удалить сообщения?
         </h2>
-        <p className={styles.message}>
-          {count === 1
-            ? 'This message will be permanently deleted.'
-            : `${count} messages will be permanently deleted.`}
-        </p>
+        <p className={styles.message}>{deleteMessage}</p>
 
         {deleteError ? <p className={styles.error}>{deleteError}</p> : null}
 
@@ -42,7 +43,7 @@ export function ConfirmDeleteModal() {
             disabled={isDeleting}
             onClick={closeConfirm}
           >
-            Cancel
+            Отмена
           </button>
           <button
             className={styles.deleteButton}
@@ -50,7 +51,7 @@ export function ConfirmDeleteModal() {
             disabled={isDeleting}
             onClick={() => void executeDelete()}
           >
-            {isDeleting ? 'Deleting…' : 'Delete'}
+            {isDeleting ? 'Удаление…' : 'Удалить'}
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 {
-  "name": "Gym Diary",
-  "short_name": "Gym Diary",
+  "name": "Дневник",
+  "short_name": "Дневник",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

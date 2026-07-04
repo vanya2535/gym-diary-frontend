@@ -79,7 +79,7 @@ export const useDiarySelectionStore = create<DiarySelectionState>((set, get) => 
     } catch (error) {
       set({
         isDeleting: false,
-        deleteError: error instanceof Error ? error.message : 'Failed to delete messages',
+        deleteError: error instanceof Error ? error.message : 'Не удалось удалить сообщения',
       })
     }
   },

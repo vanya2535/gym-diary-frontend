@@ -1,7 +1,9 @@
 import { ROUTES } from './routes.ts'
 
 export const NAV_ITEMS = [
-  { to: ROUTES.workouts, label: 'Workouts' },
-  { to: ROUTES.nutrition, label: 'Nutrition' },
-  { to: ROUTES.measurements, label: 'Measurements' },
+  { to: ROUTES.workouts, label: 'Тренировки' },
+  { to: ROUTES.nutrition, label: 'Питание' },
+  { to: ROUTES.measurements, label: 'Замеры' },
 ] as const
+
+export const APP_TITLE = 'Дневник'

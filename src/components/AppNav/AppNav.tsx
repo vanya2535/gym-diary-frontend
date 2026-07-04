@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal/index.ts'
-import { NAV_ITEMS } from '../../constants/navigation.ts'
+import { APP_TITLE, NAV_ITEMS } from '../../constants/navigation.ts'
 import { useAuthStore } from '../../hooks/authStore.ts'
 import { useDiarySelectionStore } from '../../hooks/diarySelectionStore.ts'
 import { useSidebarSwipe } from '../../hooks/useSidebarSwipe.ts'
+import { pluralRu } from '../../utils/pluralRu.ts'
 import styles from './AppNav.module.scss'
 
 function MenuIcon() {
@@ -120,7 +121,7 @@ export function AppNav() {
     onClose: closeSidebar,
   })
 
-  const currentTitle = NAV_ITEMS.find((item) => location.pathname === item.to)?.label ?? 'Gym Diary'
+  const currentTitle = NAV_ITEMS.find((item) => location.pathname === item.to)?.label ?? APP_TITLE
 
   useEffect(() => {
     if (!isSidebarOpen) {
@@ -147,7 +148,7 @@ export function AppNav() {
           <button
             className={styles.iconButton}
             type="button"
-            aria-label="Clear selection"
+            aria-label="Снять выделение"
             onClick={clearSelection}
           >
             <BackIcon />
@@ -156,7 +157,7 @@ export function AppNav() {
           <button
             className={styles.iconButton}
             type="button"
-            aria-label="Open menu"
+            aria-label="Открыть меню"
             aria-expanded={isSidebarOpen}
             aria-controls="app-sidebar"
             onClick={openSidebar}
@@ -165,14 +166,14 @@ export function AppNav() {
           </button>
         )}
 
-        <h1 className={styles.title}>{isSelectionActive ? 'Selected' : currentTitle}</h1>
+        <h1 className={styles.title}>{isSelectionActive ? 'Выбрано' : currentTitle}</h1>
 
         {isSelectionActive ? (
           <div className={styles.selectionActions}>
             <button
               className={styles.iconButton}
               type="button"
-              aria-label={`Copy ${selectedCount} messages`}
+              aria-label={`Скопировать ${selectedCount} ${pluralRu(selectedCount, 'сообщение', 'сообщения', 'сообщений')}`}
               onClick={() => void copySelected()}
             >
               <CopyIcon />
@@ -180,7 +181,7 @@ export function AppNav() {
             <button
               className={`${styles.iconButton} ${styles.delete}`}
               type="button"
-              aria-label={`Delete ${selectedCount} messages`}
+              aria-label={`Удалить ${selectedCount} ${pluralRu(selectedCount, 'сообщение', 'сообщения', 'сообщений')}`}
               onClick={openConfirm}
             >
               <DeleteIcon />
@@ -199,7 +200,7 @@ export function AppNav() {
         id="app-sidebar"
         className={isSidebarOpen ? styles.sidebarOpen : styles.sidebar}
         aria-hidden={!isSidebarOpen}
-        aria-label="Main navigation"
+        aria-label="Основная навигация"
       >
         <nav className={styles.sidebarNav}>
           {NAV_ITEMS.map((item) => (
@@ -225,7 +226,7 @@ export function AppNav() {
           }}
         >
           <LogoutIcon />
-          Sign out
+          Выйти
         </button>
       </aside>
 
