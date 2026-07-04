@@ -10,13 +10,13 @@ Frontend-приложение «Gym Diary» — клиентская часть 
 
 | Слой             | Технология                 | Версия (на момент инициализации) |
 | ---------------- | -------------------------- | -------------------------------- |
-| Сборка           | Vite                       | ^8.1.0                           |
+| Сборка           | Vite                       | 8.1.3                            |
 | UI               | React                      | ^19.2.7                          |
 | HTTP-клиент      | axios                      | ^1.x                             |
 | Стили            | Sass (SCSS modules)        | ^1.x                             |
 | Маршрутизация    | react-router-dom           | ^7.x                             |
 | Состояние (auth) | zustand                    | ^5.x                             |
-| Язык             | TypeScript                 | ~6.0.2                           |
+| Язык             | TypeScript                 | 5.9.3                            |
 | Линтер           | ESLint + typescript-eslint | ^10.x                            |
 | Форматирование   | Prettier                   | ^3.x                             |
 
@@ -245,17 +245,21 @@ HTTP-клиент: `src/services/api.ts` (axios instance `apiClient`, обёрт
 
 ## Зависимости (npm)
 
-CI (GitHub Actions) и локальная reproducible-сборка используют **`npm ci`**, который требует **полной синхронизации** `package.json` и `package-lock.json`. Рассинхрон (например, пакет добавлен в `package.json`, а lock не обновлён) ломает деплой с ошибкой `EUSAGE` / `Missing: … from lock file`.
+CI (GitHub Actions) использует **`npm ci`** — нужна полная синхронизация `package.json` и `package-lock.json`.
 
-**Обязательно для агента при любом изменении зависимостей:**
+**Версии — только exact (без `^`, `~`, `*`):**
 
-1. Меняй **`package.json` и `package-lock.json` в одном коммите** — не коммить один без другого.
-2. После добавления, удаления или смены версии пакета выполни **`npm install`** (не правь `package-lock.json` вручную).
-3. Проверь установку: **`rm -rf node_modules && npm ci`** — должно завершиться без ошибок.
-4. Если меняешь линтер/форматтер/CLI — обнови **`scripts/`**, npm-скрипты в `package.json` и раздел «Стек» (не оставляй ссылки на удалённые пакеты, как `eslint` после перехода на `oxlint`).
-5. Убедись, что в lock все `resolved` указывают на `registry.npmjs.org` (см. `.npmrc`).
+- В `package.json` — точные версии: `"vite": "8.1.3"`, не `"^8.1.3"`.
+- В `.npmrc`: **`save-exact=true`**.
+- Не редактируй `package-lock.json` вручную; не удаляй lock из репозитория.
 
-**Типичная ошибка агента:** отредактировал только `package.json` или забыл закоммитить обновлённый lock — на CI `npm ci` падает, хотя локально `npm run dev` может работать со старым `node_modules`.
+**Обязательно для агента:**
+
+1. Коммить **`package.json` + `package-lock.json`** вместе.
+2. После изменений: **`npm install`**, затем **`rm -rf node_modules && npm ci`**, затем **`npm run build`**.
+3. Обновляй раздел «Стек» и npm-скрипты при смене пакетов.
+
+**Типичные ошибки:** только `package.json` без lock; диапазоны версий → разный граф на CI (rolldown optional bindings); TypeScript 6.x без совместимого `typescript-eslint` → `ERESOLVE`.
 
 ## Ограничения
 
