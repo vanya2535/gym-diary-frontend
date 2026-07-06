@@ -4,11 +4,17 @@ import { AuthInit } from '../components/AuthInit/index.ts'
 import { GuestRoute } from '../components/GuestRoute/index.ts'
 import { ProtectedRoute } from '../components/ProtectedRoute/index.ts'
 import { ROUTES } from '../constants/routes.ts'
+import { useLastDiaryPage } from '../hooks/useLastDiaryPage.ts'
 import { AuthPage } from '../pages/auth/AuthPage.tsx'
 import { MeasurementsPage } from '../pages/measurements/MeasurementsPage.tsx'
 import { NutritionPage } from '../pages/nutrition/NutritionPage.tsx'
 import { ProfilePage } from '../pages/profile/ProfilePage.tsx'
 import { WorkoutsPage } from '../pages/workouts/WorkoutsPage.tsx'
+
+function LastDiaryPageRedirect() {
+  const { lastDiaryPageRoute } = useLastDiaryPage()
+  return <Navigate to={lastDiaryPageRoute} replace />
+}
 
 export function App() {
   return (
@@ -17,7 +23,7 @@ export function App() {
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route path={ROUTES.home} element={<Navigate to={ROUTES.workouts} replace />} />
+            <Route path={ROUTES.home} element={<LastDiaryPageRedirect />} />
             <Route path={ROUTES.workouts} element={<WorkoutsPage />} />
             <Route path={ROUTES.nutrition} element={<NutritionPage />} />
             <Route path={ROUTES.measurements} element={<MeasurementsPage />} />
@@ -29,7 +35,7 @@ export function App() {
           <Route path={ROUTES.auth} element={<AuthPage />} />
         </Route>
 
-        <Route path="*" element={<Navigate to={ROUTES.workouts} replace />} />
+        <Route path="*" element={<LastDiaryPageRedirect />} />
       </Routes>
     </BrowserRouter>
   )

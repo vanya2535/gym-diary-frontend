@@ -1,9 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { ROUTES } from '../../constants/routes.ts'
 import { useAuthStore } from '../../hooks/authStore.ts'
+import { useLastDiaryPage } from '../../hooks/useLastDiaryPage.ts'
 import { RouteLoading } from '../RouteLoading/index.ts'
 
 export function GuestRoute() {
+  const { lastDiaryPageRoute } = useLastDiaryPage()
   const status = useAuthStore((state) => state.status)
 
   if (status === 'idle' || status === 'loading') {
@@ -11,7 +12,7 @@ export function GuestRoute() {
   }
 
   if (status === 'authenticated') {
-    return <Navigate to={ROUTES.workouts} replace />
+    return <Navigate to={lastDiaryPageRoute} replace />
   }
 
   return <Outlet />
